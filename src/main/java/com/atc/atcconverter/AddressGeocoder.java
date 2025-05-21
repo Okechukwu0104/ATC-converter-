@@ -1,121 +1,3 @@
-//package com.atc.atcconverter;
-//
-//import org.apache.http.client.methods.CloseableHttpResponse;
-//import org.apache.http.client.methods.HttpGet;
-//import org.apache.http.impl.client.CloseableHttpClient;
-//import org.apache.http.impl.client.HttpClients;
-//import org.apache.http.util.EntityUtils;
-//import com.fasterxml.jackson.databind.JsonNode;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//
-//import java.io.BufferedReader;
-//import java.io.IOException;
-//import java.io.InputStreamReader;
-//import java.net.URLEncoder;
-//import java.nio.charset.StandardCharsets;
-//
-//public class LagosGeocoder {
-//    private static final String MAPBOX_API_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
-//    private static final String ACCESS_TOKEN = "pk.eyJ1Ijoiby1jaHVrd3VrYXNpIiwiYSI6ImNtYXYwcTE2dTAwMXMya3M4NXo3Z2k1cHMifQ.cXZ0zN8loENSXW1-lj8-4g";
-//
-//    // Lagos bounding box (min lng, min lat, max lng, max lat)
-//    private static final double[] LAGOS_BOUNDS = {3.2, 6.3, 3.6, 6.8};
-//
-//    public static double[] getCoordinates(String location) throws IOException {
-//        String query = location + ", Lagos, Nigeria";
-//        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-//        String url = MAPBOX_API_URL + encodedQuery + ".json" +
-//                "?country=ng" +
-//                "&types=poi,address,place" +
-//                "&limit=1" +
-//                "&access_token=" + ACCESS_TOKEN;
-//
-//        System.out.println("API Request URL: " + url); // Added logging
-//
-//        try {
-//            JsonNode response = executeRequest(url);
-//            System.out.println("API Response: " + response.toString()); // Added logging
-//            JsonNode features = response.get("features");
-//
-//            if (features != null && features.size() > 0) {
-//                JsonNode bestMatch = features.get(0);
-//                JsonNode center = bestMatch.get("center");
-//                JsonNode placeName = bestMatch.get("place_name");
-//
-//                if (center != null && center.size() >= 2) {
-//                    double lng = center.get(0).asDouble();
-//                    double lat = center.get(1).asDouble();
-//
-//                    if (isWithinLagos(lat, lng)) {
-//                        System.out.println("Found match: " + (placeName != null ? placeName.asText() : "N/A"));
-//                        return new double[]{lat, lng};
-//                    } else {
-//                        throw new IOException("Location found but outside Lagos State boundaries.");
-//                    }
-//                } else {
-//                    throw new IOException("No coordinates found in the API response.");
-//                }
-//            } else {
-//                throw new IOException("No results found for '" + location + "' in Lagos, Nigeria.");
-//            }
-//        } catch (IOException e) {
-//            throw new IOException("Geocoding request failed for '" + location + "': " + e.getMessage());
-//        }
-//    }
-//
-//    private static JsonNode executeRequest(String url) throws IOException {
-//        try (CloseableHttpClient client = HttpClients.createDefault()) {
-//            HttpGet request = new HttpGet(url);
-//
-//            try (CloseableHttpResponse response = client.execute(request)) {
-//                String json = EntityUtils.toString(response.getEntity());
-//                JsonNode node = new ObjectMapper().readTree(json);
-//
-//                if (response.getStatusLine().getStatusCode() != 200) {
-//                    throw new IOException("HTTP " + response.getStatusLine().getStatusCode() +
-//                            (node.has("message") ? ": " + node.get("message").asText() : ""));
-//                }
-//                return node;
-//            }
-//        }
-//    }
-//
-//    private static boolean isWithinLagos(double lat, double lng) {
-//        return lng >= LAGOS_BOUNDS[0] && lat >= LAGOS_BOUNDS[1] &&
-//                lng <= LAGOS_BOUNDS[2] && lat <= LAGOS_BOUNDS[3];
-//    }
-//
-//    public static void main(String[] args) throws IOException {
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-//
-//        System.out.println("LAGOS STATE GEOCODER");
-//        while(true){
-//        System.out.println("=".repeat(30));
-//        System.out.print("Enter a location in Lagos State: ");
-//        String locationInput = reader.readLine();
-//
-//        if (locationInput != null && !locationInput.trim().isEmpty()) {
-//            try {
-//                double[] coordinates = getCoordinates(locationInput);
-//                System.out.println("\nGeocoding Result:");
-//                System.out.printf("Location: %s%n", locationInput);
-//                System.out.printf("Latitude: %.6f%n", coordinates[0]);
-//                System.out.printf("Longitude: %.6f%n", coordinates[1]);
-//                System.out.println("Status: ✓ Success");
-//            } catch (IOException e) {
-//                System.out.println("\nGeocoding Failed:");
-//                System.out.printf("Location: %s%n", locationInput);
-//                System.out.println("Status: ✗ Failed: " + e.getMessage());
-//            }
-//        } else {
-//            System.out.println("No location entered.");
-//        }
-//        }
-//    }
-//}
-
-
-
 package com.atc.atcconverter;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -133,36 +15,73 @@ import java.util.Scanner;
 
 public class AddressGeocoder {
     private static final String MAPBOX_API_URL = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
-    private static final String ACCESS_TOKEN = "pk.eyJ1Ijoiby1jaHVrd3VrYXNpIiwiYSI6ImNtYXYwcTE2dTAwMXMya3M4NXo3Z2k1cHMifQ.cXZ0zN8loENSXW1-lj8-4g"; // Replace with your token
-    private static final String COUNTRY = "ng"; // Nigeria
-    private static final String PROXIMITY = "3.3792,6.5244";
+    private static final String ACCESS_TOKEN = "pk.eyJ1Ijoiby1jaHVrd3VrYXNpIiwiYSI6ImNtYXYwcTE2dTAwMXMya3M4NXo3Z2k1cHMifQ.cXZ0zN8loENSXW1-lj8-4g";
+    private static final String COUNTRY = "ng";
+    private static final String PROXIMITY = "3.3792,6.5244"; // Lagos coordinates
+    private static final String[] SEARCH_TYPES = {"poi", "address", "neighborhood", "place"};
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Lagos Address Geocoder");
-        System.out.println("-----------------------");
-        System.out.println("Enter an address in Lagos (or 'quit' to exit):");
+        System.out.println("Enhanced Lagos Location Finder");
+        System.out.println("------------------------------");
+        System.out.println("Enter a location in Lagos (or 'quit' to exit):");
+        System.out.println("Examples:");
+        System.out.println("- Yaba Shopping Complex");
+        System.out.println("- Computer Village, Ikeja");
+        System.out.println("- Ojota Bus Stop");
 
         while (true) {
-            System.out.print("\nAddress: ");
-            String address = scanner.nextLine();
+            System.out.print("\nLocation: ");
+            String location = scanner.nextLine().trim();
 
-            if (address.equalsIgnoreCase("quit")) {
+            if (location.equalsIgnoreCase("quit")) {
                 break;
             }
 
             try {
-                double[] coordinates = geocodeAddress(address);
+                GeocodeResult result = findLocation(location);
+                System.out.println("\nBest Match Found:");
+                System.out.println("-----------------");
+                System.out.println("Name: " + result.placeName);
                 System.out.printf("Coordinates: Latitude %.6f, Longitude %.6f%n",
-                        coordinates[0], coordinates[1]);
+                        result.latitude, result.longitude);
+                System.out.println("Relevance: " + (result.relevance * 100) + "%");
+                System.out.println("Type: " + result.featureType);
+                System.out.println("\nVerify on Map:");
+                System.out.println("https://www.google.com/maps?q=" +
+                        result.latitude + "," + result.longitude);
 
-                // Show Mapbox URL for verification
-                System.out.println("Verify on Map: https://www.mapbox.com/search/?query=" +
-                        URLEncoder.encode(address, StandardCharsets.UTF_8));
+                if (result.relevance < 0.7) {
+                    System.out.println("\nWarning: This match might not be exact.");
+                    System.out.println("Try adding more details like:");
+                    System.out.println("- Nearby landmarks");
+                    System.out.println("- Street names");
+                    System.out.println("- Area/district");
+                }
+            } catch (LocationNotFoundException e) {
+                System.err.println("\nError: " + e.getMessage());
+                System.err.println("\nSuggestions to improve your search:");
+                System.err.println("1. Try alternative names (e.g., 'Yaba Market' instead of 'Yaba Shopping Complex')");
+                System.err.println("2. Add the area (e.g., 'Yaba Shopping Complex, Yaba')");
+                System.err.println("3. Include nearby landmarks (e.g., 'near Yaba Tech')");
+                System.err.println("4. Check for typos in the name");
+
+                // Try a fallback search with simpler query
+                try {
+                    System.out.println("\nAttempting fallback search...");
+                    GeocodeResult fallbackResult = findLocation(location.split(",")[0].trim());
+                    System.out.println("\nFallback result found:");
+                    System.out.printf("Coordinates: %.6f, %.6f%n",
+                            fallbackResult.latitude, fallbackResult.longitude);
+                    System.out.println("Name: " + fallbackResult.placeName);
+                } catch (LocationNotFoundException ex) {
+                    System.err.println("Could not find any matching locations.");
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             } catch (IOException e) {
-                System.err.println("Error: " + e.getMessage());
-                System.err.println("Try being more specific (include area/landmark)");
+                System.err.println("API Error: " + e.getMessage());
             }
         }
 
@@ -170,11 +89,14 @@ public class AddressGeocoder {
         System.out.println("Geocoding service ended");
     }
 
-    public static double[] geocodeAddress(String address) throws IOException {
-        String encodedAddress = URLEncoder.encode(address + ", Lagos", StandardCharsets.UTF_8);
+    public static GeocodeResult findLocation(String location) throws IOException, LocationNotFoundException {
+        String encodedLocation = URLEncoder.encode(location + ", Lagos", StandardCharsets.UTF_8);
+
+        // First try with all search types
         String requestUrl = String.format(
-                "%s%s.json?country=%s&proximity=%s&access_token=%s",
-                MAPBOX_API_URL, encodedAddress, COUNTRY, PROXIMITY, ACCESS_TOKEN
+                "%s%s.json?country=%s&proximity=%s&access_token=%s&types=%s",
+                MAPBOX_API_URL, encodedLocation, COUNTRY, PROXIMITY, ACCESS_TOKEN,
+                String.join(",", SEARCH_TYPES)
         );
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -182,31 +104,72 @@ public class AddressGeocoder {
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
-                return parseCoordinates(jsonResponse, address);
+                return parseBestResult(jsonResponse, location);
             }
         }
     }
 
-    private static double[] parseCoordinates(String jsonResponse, String address) throws IOException {
+    private static GeocodeResult parseBestResult(String jsonResponse, String originalQuery)
+            throws IOException, LocationNotFoundException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(jsonResponse);
 
         if (rootNode.has("message")) {
-            throw new IOException("API Error: " + rootNode.get("message").asText());
+            throw new IOException(rootNode.get("message").asText());
         }
 
         JsonNode features = rootNode.get("features");
-        if (features == null || features.size() == 0) {
-            throw new IOException("No results found for: " + address);
+        if (features == null || features.isEmpty()) {
+            throw new LocationNotFoundException("No results found for: " + originalQuery);
         }
 
-        JsonNode firstResult = features.get(0);
-        JsonNode center = firstResult.get("center");
-        if (center == null || center.size() < 2) {
-            throw new IOException("Invalid coordinate data in response");
+        // Find the result with highest relevance
+        JsonNode bestFeature = null;
+        double highestRelevance = 0;
+        for (JsonNode feature : features) {
+            double relevance = feature.get("relevance").asDouble();
+            if (relevance > highestRelevance) {
+                highestRelevance = relevance;
+                bestFeature = feature;
+            }
         }
 
-        // Mapbox returns [longitude, latitude]
-        return new double[]{center.get(1).asDouble(), center.get(0).asDouble()};
+        if (bestFeature == null || highestRelevance < 0.3) {
+            throw new LocationNotFoundException("No good matches found for: " + originalQuery);
+        }
+
+        JsonNode center = bestFeature.get("center");
+        String featureType = bestFeature.get("place_type").get(0).asText();
+        return new GeocodeResult(
+                center.get(1).asDouble(), // latitude
+                center.get(0).asDouble(), // longitude
+                bestFeature.get("place_name").asText(),
+                highestRelevance,
+                featureType
+        );
+    }
+
+    static class GeocodeResult {
+        final double latitude;
+        final double longitude;
+        final String placeName;
+        final double relevance;
+        final String featureType;
+
+        public GeocodeResult(double latitude, double longitude,
+                             String placeName, double relevance,
+                             String featureType) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.placeName = placeName;
+            this.relevance = relevance;
+            this.featureType = featureType;
+        }
+    }
+
+    static class LocationNotFoundException extends Exception {
+        public LocationNotFoundException(String message) {
+            super(message);
+        }
     }
 }
